@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* You can add custom base styles here if needed */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8fafc; /* A light gray background for a clean look */
+}
