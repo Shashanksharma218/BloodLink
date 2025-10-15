@@ -10,7 +10,7 @@ function ContactPage() {
 
         <div className="grid md:grid-cols-2 gap-12 items-start">
           {/* Left Column: Contact Form */}
-          <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg">
+          <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg order-2 md:order-1">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">Send Us a Message</h2>
             <form className="space-y-6">
               {/* Name & Email */}
@@ -50,15 +50,15 @@ function ContactPage() {
           </div>
 
           {/* Right Column: Illustration & Contact Info */}
-          <div className="flex flex-col items-center text-center md:text-left md:items-start pt-8">
-            <div className="text-center">
+          <div className="flex flex-col items-center text-center md:text-left md:items-start order-1 md:order-2">
+            <div className="text-center md:text-left">
               <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">Get in Touch</h1>
-              <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 mt-4 max-w-2xl mx-auto md:mx-0">
                 We are here to help. Whether you have a question about donations, the registration process, or anything else, our team is ready to answer all your questions.
               </p>
             </div>
-            <img src={contactIllustration} alt="Contact Us Illustration" className="w-full max-w-sm mb-8 mx-auto" />
-            <div className="space-y-4 text-gray-700">
+            <img src={contactIllustration} alt="Contact Us Illustration" className="w-full max-w-sm my-8 mx-auto" />
+            <div className="space-y-4 text-gray-700 inline-block text-left">
               <div className="flex items-center space-x-3">
                 <span className="font-semibold">Address:</span>
                 <span>Govt. Hospital, Una, Himachal Pradesh, 174303</span>

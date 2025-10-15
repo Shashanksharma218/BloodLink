@@ -1,34 +1,40 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-// Import your new components
+// Import all your page and layout components
 import Header from './components/Header';
-import HomePage from './components/HomePage';
 import Footer from './components/Footer';
-import DonorRegistrationPage from './components/DonorRegistrationPage';
+import HomePage from './components/HomePage';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
+import DonorRegistrationPage from './components/DonorRegistrationPage';
+import DonorDashboardPage from './components/DonorDashboardPage';
+import HospitalLoginPage from './components/HospitalLoginPage';
+import HospitalDashboardPage from './components/HospitalDashboardPage'; 
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      {/* Header will be on every page */}
+    // The <Router> component has been removed from this file.
+    // It should only exist once in your application's entry point (e.g., index.js).
+    <div className="flex flex-col min-h-screen bg-gray-50">
       <Header />
       
-      {/* Routes will determine which page's main content is shown */}
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/register-donor" element={<DonorRegistrationPage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contact" element={<ContactPage />} />
-        {/* You can add other pages here later, like this: */}
-        {/* <Route path="/about" element={<AboutPage />} /> */}
-      </Routes>
-      
-      {/* Footer will also be on every page */}
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/register-donor" element={<DonorRegistrationPage />} />
+          <Route path="/donor-dashboard" element={<DonorDashboardPage />} />
+          <Route path="/hospital-login" element={<HospitalLoginPage />} />
+          <Route path="/hospital-dashboard" element={<HospitalDashboardPage />} />
+        </Routes>
+      </main>
+
       <Footer />
     </div>
   );
 }
 
 export default App;
+
