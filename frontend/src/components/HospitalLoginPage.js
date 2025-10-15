@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-// Find a suitable illustration on unDraw by searching for "secure login" or "authentication"
 import loginIllustration from 'url:../assets/login-illustration.svg'; 
 
 function HospitalLoginPage() {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,15 +18,13 @@ function HospitalLoginPage() {
     setError('');
 
     // --- Hardcoded Credentials for Govt. Hospital, Una ---
-    // In a real application, this would be a secure API call.
-    const MOCK_USER = "admin@bloodlinkuna.in";
+    const MOCK_USER = "bloodlink.iiitu@gmail.com";
     const MOCK_PASS = "UnaHP@123";
 
     setTimeout(() => {
         if (email === MOCK_USER && password === MOCK_PASS) {
-            // alert("Login Successful!"); // Avoid using alerts
-            // Redirect to hospital dashboard
-            navigate('/hospital-dashboard'); // You'll create this page next
+            login({ type: 'hospital', email: MOCK_USER });
+            navigate('/hospital-dashboard'); // redirect to hospital dashboard
         } else {
             setError("Invalid email or password. Please try again.");
         }
@@ -57,7 +56,7 @@ function HospitalLoginPage() {
                   name="email" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@bloodlinkuna.in" 
+                  placeholder="bloodlink.iiitu@gmail.com" 
                   required 
                   className="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500" 
                 />

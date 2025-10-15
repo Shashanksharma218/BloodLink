@@ -14,9 +14,9 @@ const allDonors = [
 ];
 
 const initialRequests = [
-    { id: 101, bloodGroup: 'A+', urgency: 'Urgent', date: '2023-10-28', status: 'Pending' },
-    { id: 102, bloodGroup: 'B+', urgency: 'High', date: '2023-10-27', status: 'Accepted', donorName: 'Amit Kumar' },
-    { id: 103, bloodGroup: 'O+', urgency: 'Medium', date: '2023-10-26', status: 'Completed', donorName: 'Priya Sharma' },
+    { id: 101, bloodGroup: 'A+', urgency: 'Urgent', date: '2025-10-25', status: 'Pending' },
+    { id: 102, bloodGroup: 'B+', urgency: 'High', date: '2025-10-07', status: 'Accepted', donorName: 'Amit Kumar' },
+    { id: 103, bloodGroup: 'O+', urgency: 'Medium', date: '2025-10-06', status: 'Completed', donorName: 'Priya Sharma' },
 ];
 // --- End Mock Data ---
 

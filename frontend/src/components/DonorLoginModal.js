@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 function DonorLoginModal({ isVisible, onClose }) {
+  const { login } = useAuth();
   const [step, setStep] = useState('phone'); // 'phone' or 'otp'
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otp, setOtp] = useState('');
@@ -33,6 +35,7 @@ function DonorLoginModal({ isVisible, onClose }) {
     // Simulate OTP verification
     setTimeout(() => {
       setIsLoading(false);
+      login({ type: 'donor', name: 'Shashank Sharma' });
       navigate('/donor-dashboard') // Replace with actual login logic
       onClose(); // Close modal on success
     }, 1500);

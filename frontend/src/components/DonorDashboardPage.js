@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // --- Mock Data ---
-// In a real application, this would come from an API call
 const mockDonor = {
   name: "Shashank Sharma",
-  lastDonation: "2023-07-15"
+  lastDonation: "2025-02-15"
 };
 
 const initialRequests = [
-  { id: 1, bloodGroup: 'A+', urgency: 'Urgent', date: '2023-10-28', note: 'Patient in critical condition, requires immediate transfusion.', status: 'Pending' },
-  { id: 2, bloodGroup: 'A+', urgency: 'High', date: '2023-10-25', note: 'Scheduled surgery for tomorrow morning.', status: 'Pending' },
+  { id: 1, bloodGroup: 'O+', urgency: 'Urgent', date: '2025-10-22', note: 'Patient in critical condition, requires immediate transfusion.', status: 'Pending' },
+  { id: 2, bloodGroup: 'O+', urgency: 'High', date: '2025-10-25', note: 'Scheduled surgery for tomorrow morning.', status: 'Pending' },
 ];
 // --- End Mock Data ---
 
@@ -19,9 +19,11 @@ function DonorDashboardPage() {
   const [isAvailable, setIsAvailable] = useState(true);
   const [requests, setRequests] = useState(initialRequests);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
     // Add any real logout logic here (e.g., clearing tokens)
+    logout();
     console.log("User logged out.");
     navigate('/'); // Redirect to homepage after logout
   };
