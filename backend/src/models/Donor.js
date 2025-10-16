@@ -26,10 +26,7 @@ const donorSchema = new mongoose.Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        // Email is optional, but if provided, it must be valid
         validate: [validator.isEmail, "Please provide a valid email address."],
-        // sparse:true allows multiple documents to have no email without causing a unique index error
-        sparse: true, 
     },
     bloodGroup: {
         type: String,
@@ -52,7 +49,6 @@ const donorSchema = new mongoose.Schema({
     },
     isAvailable: {
         type: Boolean,
-        required: true,
         default: true, // Donors are available by default upon registration
     },
     lastDonationDate: {

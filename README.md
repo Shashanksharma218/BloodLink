@@ -85,14 +85,49 @@ The project follows a standard React application structure:
 
 ```
 /
-├── src/
-│   ├── assets/         # Images, SVGs, and other static assets
-│   ├── components/     # Reusable React components (Header, Footer, Modals, Pages)
-│   ├── App.js          # Main application component with routing
-│   └── index.js        # Entry point of the React application
-├── .gitignore
-├── index.html          # The HTML entry point for Parcel
-├── package.json
-└── README.md
+├── README.md
+├── backend
+│   ├── package-lock.json
+│   ├── package.json
+│   └── src
+│       ├── app.js
+│       ├── config
+│       │   └── database.js
+│       └── models
+│           └── Donor.js
+└── frontend
+    ├── index.html
+    ├── package-lock.json
+    ├── package.json
+    └── src
+        ├── App.js
+        ├── assets
+        │   ├── about-illustration.svg
+        │   ├── blood-drop.png
+        │   ├── contact-illustration.svg
+        │   ├── donate-icon.png
+        │   ├── donate-icon.svg
+        │   ├── donation-illustration.png
+        │   ├── form-illustration.svg
+        │   ├── hero-illustration.png
+        │   ├── login-illustration.svg
+        │   ├── notify-icon.svg
+        │   ├── register-icon.jpg
+        │   └── register-icon.svg
+        ├── components
+        │   ├── AboutPage.js
+        │   ├── ContactPage.js
+        │   ├── DonorDashboardPage.js
+        │   ├── DonorLoginModal.js
+        │   ├── DonorRegistrationPage.js
+        │   ├── Footer.js
+        │   ├── Header.js
+        │   ├── HomePage.js
+        │   ├── HospitalDashboardPage.js
+        │   └── HospitalLoginPage.js
+        ├── context
+        │   └── AuthContext.js
+        ├── index.css
+        └── index.js
 
 ```
