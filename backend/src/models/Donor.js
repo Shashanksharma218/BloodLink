@@ -14,7 +14,6 @@ const donorSchema = new mongoose.Schema({
         trim: true,
         validate: {
             validator: function(v) {
-                // Validates that the number is exactly 10 digits
                 return /^\d{10}$/.test(v);
             },
             message: props => `${props.value} is not a valid 10-digit phone number!`
@@ -40,7 +39,7 @@ const donorSchema = new mongoose.Schema({
     },
     gender: {
         type: String,
-        enum: ['Male', 'Female', 'Other'], // Matches the frontend form
+        enum: ['Male', 'Female', 'Other'],
     },
     location: {
         type: String,
@@ -49,16 +48,21 @@ const donorSchema = new mongoose.Schema({
     },
     isAvailable: {
         type: Boolean,
-        default: true, // Donors are available by default upon registration
+        default: true,
     },
     lastDonationDate: {
         type: Date,
+    },
+    otp: {
+        type: String,
+    },
+    otpExpires: {
+        type: Date,
     }
 }, {
-    timestamps: true // Automatically adds createdAt and updatedAt fields
+    timestamps: true 
 });
 
-// Mongoose will create a collection named 'donors' (plural and lowercase) based on this model.
 const Donor = mongoose.model("Donor", donorSchema);
 
 module.exports = Donor;

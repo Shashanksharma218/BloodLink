@@ -17,7 +17,6 @@ function HospitalLoginPage() {
     setIsLoading(true);
     setError('');
 
-    // --- Hardcoded Credentials for Govt. Hospital, Una ---
     const MOCK_USER = "bloodlink.iiitu@gmail.com";
     const MOCK_PASS = "UnaHP@123";
 
@@ -36,11 +35,8 @@ function HospitalLoginPage() {
     // Responsive padding adjusted for smaller screens
     <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6">
       <div className="container mx-auto">
-        {/* MODIFIED: Now using flex for mobile stacking and grid for desktop.
-            This allows reordering of elements on mobile vs desktop. */}
         <div className="flex flex-col md:grid md:grid-cols-2 gap-x-12 gap-y-8 items-center bg-white p-6 sm:p-8 md:p-12 rounded-2xl shadow-xl max-w-4xl mx-auto">
           
-          {/* Left Column (on desktop): Form. Appears second on mobile. */}
           <div className="w-full md:order-1">
             <div className="text-center md:text-left mb-8">
                 <h2 className="text-3xl font-bold text-gray-800">Hospital Login</h2>
@@ -90,7 +86,6 @@ function HospitalLoginPage() {
             </form>
           </div>
 
-          {/* Right Column (on desktop): Illustration. Now hidden on mobile. */}
           <div className="hidden md:flex flex-col items-center text-center md:order-2">
             <img src={loginIllustration} alt="Secure Login Illustration" className="w-full max-w-xs sm:max-w-sm mb-6" />
             <h3 className="text-2xl font-bold text-gray-800">Secure & Simple</h3>

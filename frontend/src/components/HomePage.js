@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // 1. Import the useAuth hook
 
 import heroIllustration from "url:../assets/hero-illustration.png";
 import registerIcon from "url:../assets/register-icon.jpg";
@@ -9,6 +10,7 @@ import donationIllustration from "url:../assets/donation-illustration.png"
 
 function HomePage() {
   const [selectedGroup, setSelectedGroup] = useState("A+");
+  const { isAuthenticated } = useAuth(); // 2. Get the authentication state
 
   const bloodData = {
     "A+": { take: ["O+", "O-", "A+", "A-"], give: ["A+", "AB+"] },
@@ -34,20 +36,23 @@ function HomePage() {
             <p className="text-lg text-gray-600 max-w-md mx-auto md:mx-0">
               Welcome to BloodLink Una, a platform connecting voluntary blood donors with Government Hospital, Una. Your single donation can save up to three lives.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
-              <Link
-                to="/register-donor"
-                className="w-full sm:w-auto bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105 shadow-lg text-center"
-              >
-                Register as a Donor
-              </Link>
-              <Link
-                to="/hospital-login"
-                className="w-full sm:w-auto bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition duration-300 text-center"
-              >
-                Hospital Login
-              </Link>
-            </div>
+            {/* 3. Conditionally render the buttons */}
+            {!isAuthenticated && (
+              <div className="flex flex-col sm:flex-row justify-center md:justify-start items-center space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
+                <Link
+                  to="/register-donor"
+                  className="w-full sm:w-auto bg-red-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105 shadow-lg text-center"
+                >
+                  Register as a Donor
+                </Link>
+                <Link
+                  to="/hospital-login"
+                  className="w-full sm:w-auto bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition duration-300 text-center"
+                >
+                  Hospital Login
+                </Link>
+              </div>
+            )}
           </div>
           <div className="flex items-center justify-center order-1 md:order-2">
             <img src={heroIllustration} alt="Blood Donation Illustration" className="w-full h-auto max-w-lg" />
@@ -150,4 +155,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

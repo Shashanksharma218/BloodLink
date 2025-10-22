@@ -12,7 +12,7 @@ import DonorDashboardPage from './components/DonorDashboardPage';
 import HospitalLoginPage from './components/HospitalLoginPage';
 import HospitalDashboardPage from './components/HospitalDashboardPage'; 
 import RegistrationSuccessPage from './components/RegistrationSuccessPage';
-import RequestDetailsPage from './components/RequestDetailsPage';
+// import RequestDetailsPage from './components/RequestDetailsPage';
 
 function App() {
   return (
@@ -30,7 +30,7 @@ function App() {
             <Route path="/hospital-login" element={<HospitalLoginPage />} />
             <Route path="/hospital-dashboard" element={<HospitalDashboardPage />} />
             <Route path="/registration-success" element={<RegistrationSuccessPage />} />
-            <Route path="/request-details" element={<RequestDetailsPage />} />
+            {/* <Route path="/request-details" element={<RequestDetailsPage />} /> */}
           </Routes>
         </main>
 

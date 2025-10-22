@@ -1,10 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // 1. Import useAuth
 
 // Illustration from unDraw, search for "community" or "mission"
 import aboutIllustration from 'url:../assets/about-illustration.svg';
 
 function AboutPage() {
+  const { isAuthenticated } = useAuth(); // 2. Get the authentication state
+
   return (
     <div className="bg-white py-12 md:py-20">
       <div className="container mx-auto px-6 md:px-20">
@@ -49,23 +52,24 @@ function AboutPage() {
           </div>
         </div>
 
-        {/* Call to Action Section */}
-        <div className="text-center bg-red-50 p-8 md:p-12 rounded-xl mt-16 md:mt-20 border border-red-100">
-          <h3 className="text-2xl md:text-3xl font-bold text-gray-800">Join Our Community of Lifesavers</h3>
-          <p className="text-gray-600 mt-4 mb-8 max-w-2xl mx-auto">
-            Your decision to donate blood can save up to three lives. Become a part of our mission today.
-          </p>
-          <Link 
-            to="/register-donor"
-            className="bg-red-600 text-white font-bold py-3 px-8 sm:px-10 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105 shadow-lg inline-block"
-          >
-            Register as a Donor
-          </Link>
-        </div>
+        {/* 3. Conditionally render the Call to Action section */}
+        {!isAuthenticated && (
+          <div className="text-center bg-red-50 p-8 md:p-12 rounded-xl mt-16 md:mt-20 border border-red-100">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-800">Join Our Community of Lifesavers</h3>
+            <p className="text-gray-600 mt-4 mb-8 max-w-2xl mx-auto">
+              Your decision to donate blood can save up to three lives. Become a part of our mission today.
+            </p>
+            <Link 
+              to="/register-donor"
+              className="bg-red-600 text-white font-bold py-3 px-8 sm:px-10 rounded-lg hover:bg-red-700 transition duration-300 transform hover:scale-105 shadow-lg inline-block"
+            >
+              Register as a Donor
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export default AboutPage;
-

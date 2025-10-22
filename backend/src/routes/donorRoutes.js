@@ -1,16 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const { registerDonor, loginDonor, getAvailableDonors } = require('../controllers/donorController'); // 1. Import the new login function
 
-// Route for registering a new donor
+const { 
+    registerDonor, 
+    sendOTP,
+    loginDonor, 
+    getAvailableDonors, 
+    updateAvailability,
+    getDonorById,
+    getAllDonors,
+} = require('../controllers/donorController');
+
+// registering a new donor
 router.post('/register', registerDonor);
 
-// Route for donor login
+// donor login
+
+router.post('/send-otp', sendOTP);
+
 router.post('/login', loginDonor);
 
-// @route  GET /api/donors/available
-// @desc   Get a list of all donors who are available to donate
 router.get('/available', getAvailableDonors);
 
+router.get('/', getDonorById);
+
+router.put('/availability', updateAvailability);
+
+router.get('/all', getAllDonors);
 
 module.exports = router;

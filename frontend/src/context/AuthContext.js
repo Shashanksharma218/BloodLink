@@ -1,28 +1,68 @@
-import React, { createContext, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState(null); // null if logged out, user object if logged in
-    const navigate = useNavigate();
+export const useAuth = () => useContext(AuthContext);
 
-    // Call this function when a user successfully logs in
+export const AuthProvider = ({ children }) => {
+    const [currentUser, setCurrentUser] = useState(() => {
+        try {
+            const storedUser = localStorage.getItem('currentUser');
+            return storedUser ? JSON.parse(storedUser) : null;
+        } catch (error) {
+            console.error("Error parsing user from localStorage", error);
+            return null;
+        }
+    });
+    const [loading, setLoading] = useState(false); 
+
     const login = (userData) => {
         setCurrentUser(userData);
+        localStorage.setItem('currentUser', JSON.stringify(userData));
     };
 
-    // Call this function to log the user out
     const logout = () => {
         setCurrentUser(null);
-        navigate('/'); // Redirect to homepage on logout
+        localStorage.removeItem('currentUser');
+    };
+
+    const refreshCurrentUser = async () => {
+        if (!currentUser?._id) {
+            console.log("No user to refresh.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await fetch(`http://localhost:5555/api/donors`, {credentials: 'include'});
+            if (!response.ok) {
+                throw new Error('Could not fetch latest user data.');
+            }
+            const updatedUserData = await response.json();
+            
+            // --- FIX ---
+            // The data from the API (updatedUserData) doesn't have the 'type' field.
+            // We merge it with the existing currentUser to preserve the 'type' property.
+            const finalUserData = { ...currentUser, ...updatedUserData };
+            login(finalUserData);
+            console.log("User profile has been refreshed.");
+
+        } catch (error) {
+            console.error("Failed to refresh user data:", error);
+            alert("Could not refresh your profile. You may need to log in again.");
+            logout();
+        } finally {
+            setLoading(false);
+        }
     };
 
     const value = {
         currentUser,
+        loading,
         isAuthenticated: !!currentUser,
         login,
         logout,
+        refreshCurrentUser,
     };
 
     return (
@@ -32,7 +72,3 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Custom hook to easily use the auth context in other components
-export const useAuth = () => {
-    return useContext(AuthContext);
-};

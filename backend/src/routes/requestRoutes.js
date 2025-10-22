@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
+
 const { 
     createBloodRequest, 
     getAllRequests, 
     cancelRequest,
-    markRequestCompleted,
+    updateRequestStatusByHospital, // Updated function import
     getRequestsForDonor,
     updateRequestStatus,
 } = require('../controllers/requestController');
@@ -12,7 +13,7 @@ const {
 // --- Hospital Routes ---
 
 // @route   POST /api/requests
-// @desc    Create new blood requests for selected donors
+// @desc    Create new blood requests for selected donors (now includes deadline)
 router.post('/', createBloodRequest);
 
 // @route   GET /api/requests
@@ -23,21 +24,21 @@ router.get('/', getAllRequests);
 // @desc    Cancel a pending request
 router.delete('/:id', cancelRequest);
 
-// @route   PUT /api/requests/:id/complete
-// @desc    Mark an accepted request as completed
-router.put('/:id/complete', markRequestCompleted);
+
+// @route   PUT /api/requests/:id/status/hospital
+// @desc    Hospital update request status (Visit Scheduled, Donation Rejected, Donation Completed)
+router.put('/:id/status/hospital', updateRequestStatusByHospital);
 
 
 // --- Donor Routes ---
 
-// @route   GET /api/requests/donor/:donorId
-// @desc    Get all requests for a single donor
-router.get('/donor/:donorId', getRequestsForDonor);
+// @route   GET /api/requests/donor
+// @desc    Get all requests for the currently authenticated donor
+router.get('/donor', getRequestsForDonor);
 
-// @route   PUT /api/requests/:id/status
-// @desc    Update a request's status (Accept/Reject)
-router.put('/:id/status', updateRequestStatus);
+// @route   PUT /api/requests/:id/status/donor
+// @desc    Update a request's status (Donor Accepted/Donor Rejected)
+router.put('/:id/status/donor', updateRequestStatus);
 
 
 module.exports = router;
-

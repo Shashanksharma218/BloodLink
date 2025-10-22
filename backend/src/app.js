@@ -3,17 +3,19 @@ const cors = require("cors");
 const connectDB = require("./config/database");
 const donorRoutes = require('./routes/donorRoutes');
 const requestRoutes = require('./routes/requestRoutes');
-
+const cookieParser = require('cookie-parser');
 const app = express();
 
-app.use(cors()); 
+app.use(cors({
+    origin: ["http://localhost:1234"],
+    credentials: true
+})); 
 app.use(express.json());
+app.use(cookieParser());
 
 app.use('/api/donors', donorRoutes);
 
-// This tells the app that any request starting with '/api/requests'
-// should be handled by the requestRoutes router.
-app.use('/api/requests', requestRoutes);
+app.use('/api/requests', requestRoutes);//request means blood request.
 
 connectDB().then(() => {
     console.log("Database connected successfully :)")

@@ -1,38 +1,69 @@
 const mongoose = require("mongoose");
 
 const bloodRequestSchema = new mongoose.Schema({
-    // This field links the request to the specific donor it was sent to.
+    // Removed 'hospital' field as requested, assuming authentication handles user type.
+    
     donor: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Donor' // This creates a reference to your Donor model
+        ref: 'Donor' 
     },
+    
     bloodGroup: {
         type: String,
         required: true,
         enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
     },
+    
     urgency: {
         type: String,
         required: true,
         enum: ['Medium', 'High', 'Urgent']
     },
+    
+    // NEW: Deadline set by the hospital
+    deadline: {
+        type: Date,
+        required: true,
+        validate: {
+            validator: function(v) {
+                // Ensure the deadline is in the future
+                return v > Date.now();
+            },
+            message: props => `${props.value} must be a future date.`
+        }
+    },
+    
     note: {
         type: String,
         trim: true,
     },
+    
     status: {
         type: String,
         required: true,
-        enum: ["Pending", "Accepted", "Rejected", "Completed"],
-        default: "Pending" // New requests will always start as "Pending"
+        // Renamed status options for better readability and clarity in the workflow:
+        enum: [
+            "Pending", 
+            "Donor Accepted", // Replaces "Accepted" (Donor has accepted the request)
+            "Donor Rejected", // Replaces "Rejected_Donor"
+            "Visit Scheduled",// Replaces "Accepted_Visit" (Hospital is now expecting the donor)
+            "Donation Rejected", // Replaces "Rejected_Unfit" (Hospital/Screening rejection)
+            "Donation Completed"  // Replaces "Completed"
+        ],
+        default: "Pending"
+    },
+    
+    // Field for remarks to capture specific reasons for status changes
+    remarks: {
+        type: String,
+        trim: true,
+        default: ''
     }
 }, {
-    timestamps: true // Adds createdAt and updatedAt automatically
+    timestamps: true 
 });
 
-// Use the correct schema (bloodRequestSchema) for the model
 const BloodRequest = mongoose.model("BloodRequest", bloodRequestSchema);
 
 module.exports = BloodRequest;
-

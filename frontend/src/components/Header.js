@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import DonorLoginModal from './DonorLoginModal';
 import bloodIcon from "url:../assets/blood-drop.png";
-import { useAuth } from '../context/AuthContext'; // 1. Import the useAuth hook
+import { useAuth } from '../context/AuthContext'; 
 
 function Header() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
-  const { isAuthenticated, currentUser, logout } = useAuth(); // 2. Get auth state and functions
+  const { isAuthenticated, currentUser, logout } = useAuth(); 
+  const navigate = useNavigate();
 
   const navLinkStyles = ({ isActive }) => ({
     fontWeight: isActive ? 'bold' : 'normal',
@@ -16,12 +17,11 @@ function Header() {
 
   const closeMenu = () => setMenuOpen(false);
 
-  // Helper function to get the initial for the avatar
   const getAvatarInitials = () => {
     if (!currentUser) return '';
     if (currentUser.type === 'hospital') return 'H';
-    if (currentUser.name) return currentUser.name.charAt(0).toUpperCase();
-    return 'D'; // Default for Donor
+    if (currentUser.fullName) return currentUser.fullName.charAt(0).toUpperCase();
+    return 'D'; 
   };
 
   return (
@@ -61,10 +61,19 @@ function Header() {
               <NavLink to="/" style={navLinkStyles} className="hover:text-red-600" onClick={closeMenu}>Home</NavLink>
               <NavLink to="/about" style={navLinkStyles} className="hover:text-red-600" onClick={closeMenu}>About</NavLink>
               <NavLink to="/contact" style={navLinkStyles} className="hover:text-red-600" onClick={closeMenu}>Contact Us</NavLink>
+              {isAuthenticated && (
+                <NavLink 
+                  to={currentUser.type === 'donor' ? '/donor-dashboard' : '/hospital-dashboard'}
+                  style={navLinkStyles} 
+                  className="hover:text-red-600" 
+                  onClick={closeMenu}
+                >
+                  My Dashboard
+                </NavLink>
+              )}
             </div>
             
             <div className="pt-4 md:pt-0 mt-4 md:mt-0 border-t md:border-none border-gray-100">
-              {/* 3. Conditionally render Login Buttons OR User Avatar */}
               {isAuthenticated ? (
                 <div className="flex items-center space-x-4">
                   <Link 
@@ -75,7 +84,7 @@ function Header() {
                   >
                     {getAvatarInitials()}
                   </Link>
-                  <button onClick={() => { logout(); closeMenu(); }} className="bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-200">
+                  <button onClick={() => { logout(); closeMenu(); navigate('/');}} className="bg-gray-100 text-gray-700 font-medium py-2 px-4 rounded-lg hover:bg-gray-200">
                     Logout
                   </button>
                 </div>
@@ -105,3 +114,4 @@ function Header() {
 }
 
 export default Header;
+
