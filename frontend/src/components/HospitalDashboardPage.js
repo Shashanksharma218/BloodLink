@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Send, List, Users, Lock, MessageSquare, User, LogOut, ChevronDown } from 'lucide-react';
+import {useAuth} from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function HospitalDashboardPage() {
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activePage, setActivePage] = useState('send-requests');
   const [allDonors, setAllDonors] = useState([]);
@@ -29,6 +32,8 @@ function HospitalDashboardPage() {
   const [currentUpdateStatus, setCurrentUpdateStatus] = useState('');
   const [currentRemarks, setCurrentRemarks] = useState('');
   const [updateError, setUpdateError] = useState('');
+
+  const {logout} = useAuth();
 
 
   // Mock messages data
@@ -432,7 +437,7 @@ function HospitalDashboardPage() {
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          <button className={`w-full flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors relative`}>
+          <button className={`w-full flex items-center px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors relative`} onClick={()=>{logout(); navigate('/')}}>
             {/* Icon container with fixed width */}
             <div className="w-5 flex items-center justify-center flex-shrink-0">
               <LogOut size={20} />
