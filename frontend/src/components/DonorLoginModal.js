@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../config/api';
 
 function DonorLoginModal({ isVisible, onClose }) {
   const [email, setEmail] = useState('');
@@ -30,7 +31,7 @@ function DonorLoginModal({ isVisible, onClose }) {
     setError('');
 
     try {
-        const response = await fetch('http://localhost:5555/api/donors/send-otp', {
+        const response = await fetch(`${API_BASE_URL}/api/donors/send-otp`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -60,7 +61,7 @@ function DonorLoginModal({ isVisible, onClose }) {
     setError('');
 
     try {
-        const response = await fetch('http://localhost:5555/api/donors/login', {
+        const response = await fetch(`${API_BASE_URL}/api/donors/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -90,12 +91,12 @@ function DonorLoginModal({ isVisible, onClose }) {
     <div 
       className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex justify-center items-center p-4"
       onClick={handleClose}
-      style={{ animation: 'fadeIn 0.2s ease-out' }}
+      style={{ animation: 'fadeInLogin 0.2s ease-out' }}
     >
       <div 
         className="backdrop-blur-xl bg-white/95 rounded-2xl shadow-2xl border border-white/20 p-8 w-full max-w-md relative"
         onClick={(e) => e.stopPropagation()}
-        style={{ animation: 'scaleIn 0.3s ease-out' }}
+        style={{ animation: 'scaleInLogin 0.3s ease-out' }}
       >
         <button 
           onClick={handleClose}
@@ -243,27 +244,7 @@ function DonorLoginModal({ isVisible, onClose }) {
         )}
       </div>
 
-      <style jsx>{`
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes scaleIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9) translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-          }
-        }
-      `}</style>
+      
     </div>
   );
 }

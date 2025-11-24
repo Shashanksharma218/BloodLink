@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import API_BASE_URL from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -34,18 +35,21 @@ export const AuthProvider = ({ children }) => {
 
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:5555/api/donors`, {credentials: 'include'});
+            // Determine API endpoint based on user type
+            const endpoint = currentUser.type === 'hospital' 
+                ? `${API_BASE_URL}/api/hospitals/profile`
+                : `${API_BASE_URL}/api/donors`;
+            
+            const response = await fetch(endpoint, {credentials: 'include'});
             if (!response.ok) {
                 throw new Error('Could not fetch latest user data.');
             }
             const updatedUserData = await response.json();
             
-            // --- FIX ---
-            // The data from the API (updatedUserData) doesn't have the 'type' field.
-            // We merge it with the existing currentUser to preserve the 'type' property.
+            // Preserve the 'type' property
             const finalUserData = { ...currentUser, ...updatedUserData };
             login(finalUserData);
-            console.log("User profile has been refreshed.");
+            console.log(`${currentUser.type} profile has been refreshed.`);
 
         } catch (error) {
             console.error("Failed to refresh user data:", error);

@@ -79,6 +79,31 @@ npm start
 
 ```
 
+## Backend additions for new dashboard features
+
+The donor dashboard now uses the following endpoints in addition to existing ones:
+
+- GET `/api/requests/donor?status=&page=&limit=&sort=&from=&to=`
+  - Server should auto-expire pending requests whose `deadline < now` before returning
+  - Returns `{ requests: [...], page, totalPages, total }`
+
+- PUT `/api/requests/:id/status/donor` with `{ status, remarks? }`
+  - Reject if expired or already actioned
+  - Returns updated request
+
+- GET `/api/donors/:id/stats` -> `{ totalDonations, certificatesCount, lastDonationDate, nextEligibleDate, badges: [...] }`
+
+- GET `/api/hospitals/:id` -> `{ _id, name, contacts: [{type, value}], address }`
+
+- Notifications
+  - SSE: `/api/notifications/stream` (event: `notification`, data: notification JSON)
+  - Poll fallback: GET `/api/notifications?since=ISO_TIMESTAMP`
+  - Mark read: POST `/api/notifications/mark-read` with `{ ids: [] }`
+
+- POST `/api/donors/:id/health` with `{ date, hemoglobin, weight, notes }`
+
+Certificates endpoint remains unchanged: GET `/api/certificates/:requestId`.
+
 ## Folder Structure
 
 The project follows a standard React application structure:

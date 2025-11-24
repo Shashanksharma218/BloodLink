@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import API_BASE_URL from '../config/api';
 
 import loginIllustration from 'url:../assets/login-illustration.svg'; 
 
@@ -12,23 +13,35 @@ function HospitalLoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
-    const MOCK_USER = "bloodlink.iiitu@gmail.com";
-    const MOCK_PASS = "UnaHP@123";
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/hospitals/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password })
+      });
 
-    setTimeout(() => {
-        if (email === MOCK_USER && password === MOCK_PASS) {
-            login({ type: 'hospital', email: MOCK_USER });
-            navigate('/hospital-dashboard');
-        } else {
-            setError("Invalid email or password. Please try again.");
-        }
-        setIsLoading(false);
-    }, 1500);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Invalid email or password.');
+      }
+
+      const hospitalData = await response.json();
+      
+      // Login with hospital data
+      login(hospitalData);
+      navigate('/hospital-dashboard');
+
+    } catch (err) {
+      setError(err.message || "Invalid email or password. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

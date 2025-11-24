@@ -2,7 +2,7 @@ import React from 'react';
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-8 mt-12">
+    <footer className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white py-8 ">
       <div className="container mx-auto px-4 md:px-8 max-w-7xl">
         <div className="grid md:grid-cols-3 gap-6 mb-6">
           {/* Brand Section */}

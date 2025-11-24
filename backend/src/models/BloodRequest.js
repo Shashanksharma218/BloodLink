@@ -49,7 +49,8 @@ const bloodRequestSchema = new mongoose.Schema({
             "Donor Rejected", // Replaces "Rejected_Donor"
             "Visit Scheduled",// Replaces "Accepted_Visit" (Hospital is now expecting the donor)
             "Donation Rejected", // Replaces "Rejected_Unfit" (Hospital/Screening rejection)
-            "Donation Completed"  // Replaces "Completed"
+            "Donation Completed",  // Replaces "Completed"
+            "Expired" // Auto-marked when deadline passes while still Pending
         ],
         default: "Pending"
     },
@@ -59,6 +60,12 @@ const bloodRequestSchema = new mongoose.Schema({
         type: String,
         trim: true,
         default: ''
+    },
+    
+    // Certificate ID for completed donations
+    certificateId: {
+        type: String,
+        trim: true
     }
 }, {
     timestamps: true 

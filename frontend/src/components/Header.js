@@ -43,7 +43,7 @@ function Header() {
                 <div className="text-2xl font-bold text-gray-900 group-hover:text-red-600 transition-colors duration-300 tracking-tight">
                   BloodLink
                 </div>
-                <div className="text-xs text-gray-500 font-medium tracking-wide">Una, Himachal Pradesh</div>
+                <div className="text-sm text-gray-500 font-medium tracking-wide">Una, Himachal Pradesh</div>
               </div>
             </Link>
 
@@ -52,21 +52,21 @@ function Header() {
               <NavLink 
                 to="/" 
                 style={navLinkStyles} 
-                className="px-4 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+                className="px-4 py-2 text-[17px] rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
               >
                 Home
               </NavLink>
               <NavLink 
                 to="/about" 
                 style={navLinkStyles} 
-                className="px-4 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+                className="px-4 py-2 text-[17px] rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
               >
                 About
               </NavLink>
               <NavLink 
                 to="/contact" 
                 style={navLinkStyles} 
-                className="px-4 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+                className="px-4 py-2 text-[17px] rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
               >
                 Contact
               </NavLink>
@@ -74,7 +74,7 @@ function Header() {
                 <NavLink 
                   to={currentUser.type === 'donor' ? '/donor-dashboard' : '/hospital-dashboard'}
                   style={navLinkStyles} 
-                  className="px-4 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
+                  className="px-4 py-2 text-[17px] rounded-lg hover:bg-red-50 hover:text-red-600 transition-all duration-200"
                 >
                   Dashboard
                 </NavLink>
@@ -94,7 +94,7 @@ function Header() {
                   </Link>
                   <button 
                     onClick={() => { logout(); navigate('/');}} 
-                    className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-all duration-200"
+                    className="px-4 py-2 text-[17px] font-medium text-gray-700 hover:text-gray-900 rounded-lg hover:bg-gray-100 transition-all duration-200"
                   >
                     Logout
                   </button>
@@ -103,13 +103,13 @@ function Header() {
                 <>
                   <button 
                     onClick={() => setModalVisible(true)}
-                    className="px-5 py-2.5 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                    className="px-5 py-2.5 text-base font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
                   >
                     Donor Login
                   </button>
                   <Link 
                     to="/hospital-login" 
-                    className="px-5 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-500 rounded-lg hover:shadow-lg hover:shadow-red-500/30 transition-all duration-200 hover:scale-105"
+                    className="px-5 py-2.5 text-base font-medium text-white bg-gradient-to-r from-red-600 to-red-500 rounded-lg hover:shadow-lg hover:shadow-red-500/30 transition-all duration-200 hover:scale-105"
                   >
                     Hospital Login
                   </Link>

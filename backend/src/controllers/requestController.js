@@ -2,6 +2,9 @@ const BloodRequest = require('../models/BloodRequest');
 const Donor = require('../models/Donor');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const { sendDonationCompletionEmail } = require('../utils/emailService');
+const { createCertificatePDF } = require('./certificateController');
+const { createNotification } = require('./notificationController');
 
 // For Hospital: Create new blood requests for selected donors
 const createBloodRequest = async (req, res) => {
@@ -29,6 +32,16 @@ const createBloodRequest = async (req, res) => {
             return newRequest.save();
         });
         const createdRequests = await Promise.all(requestPromises);
+        
+        // Create notifications for each new request
+        for (const request of createdRequests) {
+            await createNotification(request.donor, 'new_request', {
+                requestId: request._id,
+                bloodGroup: request.bloodGroup,
+                urgency: request.urgency
+            });
+        }
+        
         res.status(201).json({ 
             message: `${createdRequests.length} requests created successfully.`, 
             requests: createdRequests 
@@ -43,7 +56,15 @@ const createBloodRequest = async (req, res) => {
 // For Hospital: Get all blood requests and populate donor info
 const getAllRequests = async (req, res) => {
     try {
-        const requests = await BloodRequest.find({}).sort({ createdAt: -1 }).populate('donor', 'fullName contactNumber');
+        // Auto-expire: mark any pending requests past their deadline as Expired
+        await BloodRequest.updateMany(
+            { status: 'Pending', deadline: { $lt: new Date() } },
+            { $set: { status: 'Expired', remarks: 'Request expired.' } }
+        );
+
+        const requests = await BloodRequest.find({})
+            .sort({ createdAt: -1 })
+            .populate('donor', 'fullName contactNumber');
         res.status(200).json(requests);
     } catch (error) {
         console.error('Error fetching requests:', error);
@@ -88,7 +109,7 @@ const updateRequestStatusByHospital = async (req, res) => {
     }
 
     try {
-        const request = await BloodRequest.findById(id);
+        const request = await BloodRequest.findById(id).populate('donor');
         if (!request) {
             return res.status(404).json({ message: 'Request not found.' });
         }
@@ -101,7 +122,20 @@ const updateRequestStatusByHospital = async (req, res) => {
         // Apply updates
         request.status = status;
         request.remarks = remarks || ''; // Update remarks
+        
+        // Generate and store certificate ID when donation is completed
+        if (status === 'Donation Completed' && !request.certificateId) {
+            const certificateId = `BLU-${request._id.toString().slice(-8).toUpperCase()}-${new Date().getFullYear()}`;
+            request.certificateId = certificateId;
+        }
+        
         const updatedRequest = await request.save();
+
+        // Create notification for status change
+        await createNotification(request.donor._id || request.donor, 'status_changed', {
+            requestId: updatedRequest._id,
+            status: status
+        });
 
         // Specific actions for final statuses
         if (status === 'Donation Completed') {
@@ -110,6 +144,34 @@ const updateRequestStatusByHospital = async (req, res) => {
                 isAvailable: false,
                 lastDonationDate: new Date(),
             });
+
+            // Create certificate issued notification
+            await createNotification(request.donor._id || request.donor, 'certificate_issued', {
+                requestId: updatedRequest._id,
+                certificateId: updatedRequest.certificateId
+            });
+
+            // Send email with certificate
+            try {
+                // donor details already available in request.donor (populated)
+                if (request.donor && request.donor.email) {
+                    // Generate certificate as buffer - use certificateId from updated request
+                    const certificateBuffer = await createCertificatePDF(updatedRequest, updatedRequest.certificateId);
+                    
+                    // Send email with certificate attached
+                    await sendDonationCompletionEmail(
+                        request.donor.email,
+                        request.donor.fullName,
+                        certificateBuffer
+                    );
+                    
+                    console.log(`Email with certificate sent to donor: ${request.donor.email}`);
+                }
+            } catch (emailError) {
+                console.error('Error sending email notification:', emailError);
+                // Don't fail the main operation if email fails
+                // Continue to return success response
+            }
         }
         
         res.status(200).json(updatedRequest);
@@ -137,10 +199,44 @@ const getRequestsForDonor = async (req, res) => {
     }
 
     const { _id: donorId } = decoded;
-    const requests = await BloodRequest.find({ donor: donorId })
-      .sort({ createdAt: -1 });
 
-    return res.status(200).json(requests);
+    // Auto-expire any pending requests for this donor that are past deadline
+    await BloodRequest.updateMany(
+      { donor: donorId, status: 'Pending', deadline: { $lt: new Date() } },
+      { $set: { status: 'Expired', remarks: 'Request expired.' } }
+    );
+
+    // Filters and pagination
+    const { status, urgency, from, to, page = 1, limit = 10, sort = 'newest' } = req.query;
+
+    const query = { donor: donorId };
+    if (status) query.status = status;
+    if (urgency) query.urgency = urgency;
+    if (from || to) {
+      query.createdAt = {};
+      if (from) query.createdAt.$gte = new Date(from);
+      if (to) query.createdAt.$lte = new Date(to);
+    }
+
+    const sortMap = {
+      newest: { createdAt: -1 },
+      oldest: { createdAt: 1 },
+      deadline: { deadline: 1, createdAt: -1 },
+    };
+    const sortOption = sortMap[sort] || sortMap.newest;
+
+    const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+    const limitNum = Math.min(Math.max(parseInt(limit, 10) || 10, 1), 100);
+    const skip = (pageNum - 1) * limitNum;
+
+    const [requests, total] = await Promise.all([
+      BloodRequest.find(query).sort(sortOption).skip(skip).limit(limitNum),
+      BloodRequest.countDocuments(query)
+    ]);
+
+    const totalPages = Math.max(1, Math.ceil(total / limitNum));
+
+    return res.status(200).json({ requests, page: pageNum, totalPages, total });
 
   } catch (error) {
     console.error('Error fetching donor requests:', error);
@@ -151,8 +247,21 @@ const getRequestsForDonor = async (req, res) => {
 // For Donor: Update the status of a specific request (Accept/Reject)
 const updateRequestStatus = async (req, res) => {
     try {
+        // Authentication check
+        const token = req.cookies?.token;
+        if (!token) {
+            return res.status(401).json({ message: 'Authentication token missing.' });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(token, "bloodlink.iiitu.2025");
+        } catch (err) {
+            return res.status(401).json({ message: 'Invalid or expired token.' });
+        }
+
         const { id } = req.params;
-        const { status } = req.body;
+        const { status, remarks } = req.body;
         
         const validStatuses = ['Donor Accepted', 'Donor Rejected'];
 
@@ -160,9 +269,20 @@ const updateRequestStatus = async (req, res) => {
             return res.status(400).json({ message: 'Invalid status provided. Must be Donor Accepted or Donor Rejected.' });
         }
 
-        const request = await BloodRequest.findById(id);
+        const request = await BloodRequest.findById(id).populate('donor');
         if (!request) {
             return res.status(404).json({ message: 'Request not found.' });
+        }
+
+        // Verify the request belongs to the authenticated donor
+        const donorId = decoded._id.toString();
+        if (request.donor._id.toString() !== donorId) {
+            return res.status(403).json({ message: 'You do not have permission to update this request.' });
+        }
+
+        // Prevent actions on expired requests
+        if (request.deadline && new Date(request.deadline) < new Date()) {
+            return res.status(400).json({ message: 'This request has expired.' });
         }
 
         if (request.status !== 'Pending') {
@@ -171,8 +291,11 @@ const updateRequestStatus = async (req, res) => {
 
         request.status = status;
         
-        // If rejected by donor, set the required remark
-        if (status === 'Donor Rejected') {
+        // Update remarks if provided (frontend sends remarks for rejections)
+        if (remarks && remarks.trim() !== '') {
+            request.remarks = remarks.trim();
+        } else if (status === 'Donor Rejected') {
+            // Default remark if none provided
             request.remarks = 'Rejected by donor.';
         }
 
