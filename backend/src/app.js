@@ -14,35 +14,17 @@ dotenv.config();
 
 const app = express();
 
-// CORS configuration - Allow requests from localhost and network IPs
-const allowedOrigins = [
-    "http://localhost:1234",
-    // Add your laptop's IP address here when hosting on network
-    // Example: "http://192.168.1.100:1234"
-    ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [])
-];
+const FRONTEND_URL = "https://blood-link-ashen.vercel.app";
 
 app.use(cors({
-    origin: function (origin, callback) {
-        // Allow requests with no origin (mobile apps, Postman, etc.)
-        if (!origin) return callback(null, true);
-        
-        // Allow requests from any local network IP (for development)
-        if (origin.includes('localhost') || 
-            origin.match(/^http:\/\/192\.168\.\d+\.\d+:\d+$/) ||
-            origin.match(/^http:\/\/10\.\d+\.\d+\.\d+:\d+$/) ||
-            origin.match(/^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+:\d+$/)) {
-            return callback(null, true);
-        }
-        
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS'));
-        }
-    },
+    origin: FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true
-})); 
+}));
+
+app.options("*", cors());
+
+
 app.use(express.json());
 app.use(cookieParser());
 
