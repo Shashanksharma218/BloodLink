@@ -33,8 +33,9 @@ const loginHospital = async (req, res) => {
     // Set token in HTTP-only cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: false, // Set to false for localhost, true for production HTTPS
+      sameSite: 'lax', // Changed from 'strict' to allow cross-origin requests
+      path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
