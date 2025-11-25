@@ -1,6 +1,15 @@
-const nodemailer = require('nodemailer');
+require('dotenv').config();
+const { Resend } = require('resend');
 const Donor = require('../models/Donor');
 const jwt = require('jsonwebtoken');
+
+// Initialize Resend client
+if (!process.env.RESEND_API_KEY) {
+  console.error('❌ RESEND_API_KEY missing in .env');
+  process.exit(1);
+}
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Complete registration after OTP verification
 const registerDonor = async (req, res) => {
@@ -69,23 +78,28 @@ const registerDonor = async (req, res) => {
 
 
 const sendOtpEmailService = async (email, otp) => {
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'bloodlink.iiitu@gmail.com',
-      pass: 'mdlroakccttmpfcn'
-    }
-  });
-
-  const mailOptions = {
-    from: 'bloodlink.iiitu@gmail.com',
-    to: email,
-    subject: 'Your OTP Code',
-    text: `Your verification code is ${otp}`
-  };
-
-  await transporter.sendMail(mailOptions);
-
+  try {
+    await resend.emails.send({
+      from: 'BloodLink <onboarding@resend.dev>', // Update this with your verified domain
+      to: email,
+      subject: 'Your OTP Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #6B1F1F;">BloodLink Verification Code</h2>
+          <p>Your verification code is:</p>
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center; margin: 20px 0;">
+            <h1 style="color: #6B1F1F; margin: 0; font-size: 32px; letter-spacing: 5px;">${otp}</h1>
+          </div>
+          <p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+          <p style="color: #666; font-size: 12px; margin-top: 20px;">If you didn't request this code, please ignore this email.</p>
+        </div>
+      `
+    });
+    console.log(`✅ OTP email sent to ${email}`);
+  } catch (error) {
+    console.error('❌ Error sending OTP email:', error);
+    throw error;
+  }
 };
 
 const generateOTP = () => {

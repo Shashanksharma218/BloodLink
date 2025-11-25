@@ -15,9 +15,10 @@ dotenv.config();
 const app = express();
 
 const FRONTEND_URL = "https://blood-link-ashen.vercel.app";
+const ALLOWED_ORIGINS = [FRONTEND_URL, "http://localhost:1234"];
 
 app.use(cors({
-    origin: FRONTEND_URL,
+    origin: ALLOWED_ORIGINS,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true
 }));

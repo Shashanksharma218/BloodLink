@@ -1,33 +1,31 @@
-const nodemailer = require('nodemailer');
+require('dotenv').config();
+const { Resend } = require('resend');
 
+// Initialize Resend client
+if (!process.env.RESEND_API_KEY) {
+  console.error('❌ RESEND_API_KEY missing in .env');
+  process.exit(1);
+}
 
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: process.env.SMTP_PORT || 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER || '',
-      pass: process.env.SMTP_PASS || ''
-    }
-  });
-};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendDonationCompletionEmail = async (donorEmail, donorName, certificateBuffer) => {
-  // Check if email credentials are configured
-  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    console.log('⚠️  Email credentials not configured. Skipping email notification.');
-    console.log('Please set up SMTP_USER and SMTP_PASS in backend/.env file');
+  // Check if Resend API key is configured
+  if (!process.env.RESEND_API_KEY) {
+    console.log('⚠️  RESEND_API_KEY not configured. Skipping email notification.');
+    console.log('Please set up RESEND_API_KEY in backend/.env file');
     return false;
   }
 
-  const transporter = createTransporter();
+  // Convert PDF buffer to base64 for Resend attachment
+  const pdfBase64 = certificateBuffer.toString('base64');
 
-  const mailOptions = {
-    from: `"BloodLink Una" <${process.env.SMTP_USER || 'noreply@bloodlink.com'}>`,
-    to: donorEmail,
-    subject: '🎉 Thank You! Your Blood Donation is Complete - BloodLink',
-    html: `
+  try {
+    const response = await resend.emails.send({
+      from: 'BloodLink <onboarding@resend.dev>', // Update this with your verified domain
+      to: donorEmail,
+      subject: '🎉 Thank You! Your Blood Donation is Complete - BloodLink',
+      html: `
       <!DOCTYPE html>
       <html lang="en">
       <head>
@@ -153,21 +151,18 @@ const sendDonationCompletionEmail = async (donorEmail, donorName, certificateBuf
       </body>
       </html>
     `,
-    attachments: [
-      {
-        filename: `BloodDonationCertificate_${donorName}.pdf`,
-        content: certificateBuffer,
-        contentType: 'application/pdf'
-      }
-    ]
-  };
+      attachments: [
+        {
+          filename: `BloodDonationCertificate_${donorName}.pdf`,
+          content: pdfBase64
+        }
+      ]
+    });
 
-  try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email successfully sent to ${donorEmail}`);
+    console.log(`✅ Email successfully sent to ${donorEmail}`);
     return true;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('❌ Error sending email:', error);
     throw error;
   }
 };
