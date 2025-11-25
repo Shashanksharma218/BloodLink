@@ -56,10 +56,14 @@ const registerDonor = async (req, res) => {
     // Auto-login: Generate token and set cookie
     const token = jwt.sign({ _id: donor._id }, "bloodlink.iiitu.2025");
     
+    // For production (HTTPS): secure: true, sameSite: 'none' (required for cross-origin)
+    // For development (HTTP): secure: false, sameSite: 'lax'
+    // Check if production: NODE_ENV or if request is secure (HTTPS)
+    const isProduction = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,     
-      sameSite: 'lax',   
+      secure: isProduction, // true for HTTPS (production), false for HTTP (development)
+      sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
@@ -255,15 +259,14 @@ const loginDonor = async (req, res) => {
 
     const token = jwt.sign({ _id: donor._id }, "bloodlink.iiitu.2025");
     
-    // Your cookie setup is correct for development.
-    // httpOnly: true -> Client-side JS can't access it. Good for security.
-    // secure: false -> Allows sending over HTTP. Required for localhost.
-    // sameSite: 'lax' -> Good default.
-    // maxAge: 7 days in milliseconds (7 * 24 * 60 * 60 * 1000)
+    // For production (HTTPS): secure: true, sameSite: 'none' (required for cross-origin)
+    // For development (HTTP): secure: false, sameSite: 'lax'
+    // Check if production: NODE_ENV or if request is secure (HTTPS)
+    const isProduction = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false,     
-      sameSite: 'lax',   
+      secure: isProduction, // true for HTTPS (production), false for HTTP (development)
+      sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });

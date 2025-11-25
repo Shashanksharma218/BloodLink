@@ -31,10 +31,14 @@ const loginHospital = async (req, res) => {
     );
 
     // Set token in HTTP-only cookie
+    // For production (HTTPS): secure: true, sameSite: 'none' (required for cross-origin)
+    // For development (HTTP): secure: false, sameSite: 'lax'
+    // Check if production: NODE_ENV or if request is secure (HTTPS)
+    const isProduction = process.env.NODE_ENV === 'production' || req.secure || req.headers['x-forwarded-proto'] === 'https';
     res.cookie('token', token, {
       httpOnly: true,
-      secure: false, // Set to false for localhost, true for production HTTPS
-      sameSite: 'lax', // Changed from 'strict' to allow cross-origin requests
+      secure: isProduction, // true for HTTPS (production), false for HTTP (development)
+      sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
       path: '/',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });

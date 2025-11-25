@@ -14,13 +14,28 @@ dotenv.config();
 
 const app = express();
 
+// Trust proxy for Render deployment (needed for req.secure and x-forwarded-proto to work)
+// This allows Express to correctly detect HTTPS requests behind a reverse proxy
+app.set('trust proxy', 1);
+
 const FRONTEND_URL = "https://blood-link-ashen.vercel.app";
 const ALLOWED_ORIGINS = [FRONTEND_URL, "http://localhost:1234"];
 
+// CORS configuration with proper origin handling
 app.use(cors({
-    origin: ALLOWED_ORIGINS,
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        if (ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    credentials: true
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 
